@@ -1,0 +1,174 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+import HudFrame from '../components/HudFrame.astro';
+import ParticleField from '../components/ParticleField.astro';
+import GlitchField from '../components/GlitchField.astro';
+import VentureGrid from '../components/VentureGrid.astro';
+---
+
+<BaseLayout>
+  <span id="top"></span>
+  <ParticleField />
+  <HudFrame />
+  <Nav />
+
+  <main class="relative z-10">
+    <!-- HERO -->
+    <section class="relative flex min-h-screen items-center justify-center overflow-hidden">
+      <GlitchField />
+
+      <!-- Foreground content -->
+      <div class="relative z-10 mx-auto max-w-4xl px-6 text-center">
+
+        <!-- Logo lockup -->
+        <div class="relative mx-auto mt-6 inline-flex w-[min(78vw,30rem)] animate-rise" style="animation-delay:0.1s">
+          <img
+            id="hero-logo"
+            src="/logo-full.png"
+            alt="Dern Industries"
+            class="logo-blend relative z-10 mx-auto w-full will-change-transform"
+          />
+        </div>
+
+        <!-- Typewriter status line -->
+        <div class="mt-8 animate-rise font-mono text-xs uppercase tracking-widest2 text-smoke-400 sm:text-sm" style="animation-delay:0.35s">
+          <span class="text-orange">&gt;</span>
+          <span id="boot-line"></span><span class="animate-blink text-orange">_</span>
+        </div>
+
+        <div class="mt-12 flex animate-rise items-center justify-center gap-4" style="animation-delay:0.5s">
+          <a
+            href="#ventures"
+            class="group relative border border-orange/60 px-6 py-3 font-mono text-xs uppercase tracking-widest2 text-orange transition-all hover:bg-orange hover:text-ink-950"
+          >
+            Ventures
+          </a>
+          <a
+            href="#contact"
+            class="border border-ink-500 px-6 py-3 font-mono text-xs uppercase tracking-widest2 text-smoke-300 transition-all hover:border-smoke-300 hover:text-smoke-100"
+          >
+            Contact
+          </a>
+        </div>
+      </div>
+
+      <!-- Scroll cue -->
+      <div class="absolute bottom-10 left-1/2 -translate-x-1/2 font-mono text-[0.6rem] uppercase tracking-widest2 text-smoke-500">
+        Scroll
+      </div>
+    </section>
+
+    <!-- VENTURES -->
+    <section id="ventures" class="relative border-t border-ink-700 px-6 py-28 md:px-10">
+      <div class="mx-auto max-w-6xl">
+        <div class="flex flex-col justify-between gap-4 md:flex-row md:items-end">
+          <div>
+            <p class="hud-label">01 // Ventures</p>
+            <h2 class="mt-4 font-display text-3xl font-bold uppercase tracking-wide text-smoke-100 sm:text-4xl">
+              Divisions
+            </h2>
+          </div>
+          <p class="max-w-sm font-body text-sm text-smoke-400">
+            Units operating under the Dern Industries banner.
+          </p>
+        </div>
+
+        <div class="mt-12">
+          <VentureGrid />
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <Footer />
+</BaseLayout>
+
+<script>
+  // Status line: rotating roster of pseudo-serious, tongue-in-cheek ventures
+  const el = document.getElementById('boot-line');
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const messages = [
+    'QUANTUM LOGISTICS PRODUCTS',
+    'ORBITAL COLD STORAGE',
+    'SENTIENT APPLIANCE NETWORK',
+    'AUTONOMOUS NOSTALGIA DRONES',
+    'TELEPATHIC CUSTOMER SUPPORT',
+    'HOLOGRAPHIC TAX ATTORNEY',
+    'SELF-AWARE TRAFFIC CONES',
+    'INTERPLANETARY PIZZA RELAY PROTOCOL',
+    'AI-POWERED BUREAUCRACY',
+    'CRYPTOGRAPHIC FORTUNE COOKIES',
+    'SUBTERRANEAN DATA VAULTS',
+    'ANTI-GRAVITY PARKING SOLUTIONS',
+    'TIME-TRAVEL INSURANCE',
+    'NEURAL NETWORK GARDENING',
+    'CYBERNETIC PET WALKER',
+    'ZERO-G WASTE MANAGEMENT',
+    'DREAM-GENERATED CODEBASE',
+    'HYPERSONIC COURIER PIGEONS',
+    'UNDERGROUND CLOUD COMPUTING',
+  ];
+  const GLYPHS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_ '
+  const HOLD_MS = 2200;
+
+  if (el) {
+    if (reduceMotion) {
+      el.textContent = messages[0];
+    } else {
+      let mIndex = 0;
+      let holdUntil = 0;
+      let raf = 0;
+      let cells = [];
+
+      const randomGlyph = () => GLYPHS[Math.floor(Math.random() * GLYPHS.length)];
+
+      const initMessage = (msg) => {
+        const now = performance.now();
+        cells = msg.split('').map((ch) =>
+          ch === ' '
+            ? { target: ' ', current: ' ', settledAt: now }
+            : { target: ch, current: randomGlyph(), settledAt: now + 300 + Math.random() * 900 }
+        );
+        holdUntil = 0;
+        raf = requestAnimationFrame(frame);
+      };
+
+      const render = () => {
+        el.textContent = cells.map((c) => c.current).join('');
+      };
+
+      const frame = (now) => {
+        const msg = messages[mIndex];
+        let allSettled = true;
+        cells.forEach((cell) => {
+          if (cell.target === ' ') return;
+          if (now >= cell.settledAt) {
+            cell.current = cell.target;
+          } else {
+            cell.current = randomGlyph();
+            allSettled = false;
+          }
+        });
+        render();
+
+        if (allSettled) {
+          if (!holdUntil) holdUntil = now + HOLD_MS;
+          if (now >= holdUntil) {
+            mIndex = (mIndex + 1) % messages.length;
+            initMessage(messages[mIndex]);
+            return;
+          }
+        } else {
+          holdUntil = 0;
+        }
+        raf = requestAnimationFrame(frame);
+      };
+
+      initMessage(messages[0]);
+    }
+  }
+
+
+</script>

@@ -1,0 +1,15 @@
+---
+// Fixed decorative HUD overlay: corner brackets, scanline sweep, edge readouts.
+// Purely cosmetic and pointer-events-none so it never blocks interaction.
+---
+
+<div class="pointer-events-none fixed inset-0 z-40" aria-hidden="true">
+  <!-- Scanline texture -->
+  <div class="crt-lines absolute inset-0 opacity-40 mix-blend-overlay"></div>
+
+  <!-- Moving scan sweep -->
+  <div class="absolute inset-x-0 top-0 h-24 animate-scan bg-gradient-to-b from-orange/0 via-orange/[0.06] to-orange/0"></div>
+
+  <!-- Vignette -->
+  <div class="absolute inset-0" style="box-shadow: inset 0 0 180px 40px rgba(0,0,0,0.75);"></div>
+</div>

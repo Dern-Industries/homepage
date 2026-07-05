@@ -1,0 +1,149 @@
+---
+// Three.js hero: an extruded, beveled "D" monogram that slowly rotates and
+// reacts to the pointer. Lazily initialized, DPR-capped, paused off-screen,
+// and swapped for the static SVG logo when reduced-motion is requested.
+---
+
+<div id="hero3d" class="absolute inset-0 h-full w-full">
+  <img
+    src="/logo-d.png"
+    alt="Dern Industries logo"
+    id="hero3d-fallback"
+    class="absolute left-1/2 top-1/2 h-48 w-48 -translate-x-1/2 -translate-y-1/2 opacity-90 md:h-64 md:w-64"
+  />
+</div>
+
+<script>
+  import * as THREE from 'three';
+
+  const mount = document.getElementById('hero3d');
+  const fallback = document.getElementById('hero3d-fallback');
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (mount && !reduceMotion) {
+    const scene = new THREE.Scene();
+
+    const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+    camera.position.set(0, 0, 8);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    mount.appendChild(renderer.domElement);
+    renderer.domElement.style.position = 'absolute';
+    renderer.domElement.style.inset = '0';
+
+    // --- Build the "D" shape ---
+    const shape = new THREE.Shape();
+    shape.moveTo(-1.2, -1.6);
+    shape.lineTo(-1.2, 1.6);
+    shape.lineTo(0.2, 1.6);
+    shape.bezierCurveTo(2.3, 1.6, 2.3, -1.6, 0.2, -1.6);
+    shape.lineTo(-1.2, -1.6);
+
+    const hole = new THREE.Path();
+    hole.moveTo(-0.55, -0.95);
+    hole.lineTo(-0.55, 0.95);
+    hole.lineTo(0.1, 0.95);
+    hole.bezierCurveTo(1.4, 0.95, 1.4, -0.95, 0.1, -0.95);
+    hole.lineTo(-0.55, -0.95);
+    shape.holes.push(hole);
+
+    const geometry = new THREE.ExtrudeGeometry(shape, {
+      depth: 0.7,
+      bevelEnabled: true,
+      bevelThickness: 0.12,
+      bevelSize: 0.1,
+      bevelSegments: 3,
+      curveSegments: 48,
+    });
+    geometry.center();
+
+    const material = new THREE.MeshStandardMaterial({
+      color: 0x0d0d10,
+      metalness: 0.85,
+      roughness: 0.35,
+      emissive: 0x1a1204,
+    });
+    const mesh = new THREE.Mesh(geometry, material);
+
+    // Orange wireframe edges
+    const edges = new THREE.EdgesGeometry(geometry, 25);
+    const lineMat = new THREE.LineBasicMaterial({ color: 0xf97316, transparent: true, opacity: 0.9 });
+    const wire = new THREE.LineSegments(edges, lineMat);
+
+    const group = new THREE.Group();
+    group.add(mesh);
+    group.add(wire);
+    scene.add(group);
+
+    // --- Lights ---
+    const key = new THREE.DirectionalLight(0xffd27a, 2.2);
+    key.position.set(4, 5, 6);
+    scene.add(key);
+    const rim = new THREE.DirectionalLight(0xff9a1f, 1.6);
+    rim.position.set(-6, -2, -4);
+    scene.add(rim);
+    scene.add(new THREE.AmbientLight(0x404040, 1.1));
+    const point = new THREE.PointLight(0xffb020, 30, 20);
+    point.position.set(0, 0, 5);
+    scene.add(point);
+
+    // --- Interaction ---
+    const target = { x: 0, y: 0 };
+    window.addEventListener('pointermove', (e) => {
+      target.x = (e.clientY / window.innerHeight - 0.5) * 0.6;
+      target.y = (e.clientX / window.innerWidth - 0.5) * 0.9;
+    });
+
+    function resize() {
+      const w = mount!.clientWidth;
+      const h = mount!.clientHeight;
+      renderer.setSize(w, h, false);
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    if (fallback) fallback.style.display = 'none';
+
+    let running = true;
+    const clock = new THREE.Clock();
+    function animate() {
+      if (!running) return;
+      const t = clock.getElapsedTime();
+      group.rotation.y += (target.y - group.rotation.y) * 0.05 + 0.004;
+      group.rotation.x += (target.x - group.rotation.x) * 0.05;
+      group.position.y = Math.sin(t * 0.8) * 0.12;
+      lineMat.opacity = 0.7 + Math.sin(t * 2) * 0.2;
+      renderer.render(scene, camera);
+      requestAnimationFrame(animate);
+    }
+
+    // Only run while hero is on screen
+    const io = new IntersectionObserver((entries) => {
+      for (const entry of entries) {
+        if (entry.isIntersecting && !document.hidden) {
+          if (!running) {
+            running = true;
+            animate();
+          }
+        } else {
+          running = false;
+        }
+      }
+    });
+    io.observe(mount);
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        running = false;
+      } else {
+        running = true;
+        animate();
+      }
+    });
+
+    animate();
+  }
+</script>

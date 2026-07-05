@@ -1,0 +1,51 @@
+---
+import { ventures, type VentureStatus } from '../data/ventures';
+
+const statusStyles: Record<VentureStatus, string> = {
+  live: 'text-orange border-orange/60',
+  building: 'text-orange-soft border-orange/40',
+  incoming: 'text-smoke-300 border-smoke-500/40',
+  classified: 'text-smoke-400 border-ink-500',
+};
+---
+
+<div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+  {ventures.map((v) => {
+    const Tag = v.href ? 'a' : 'div';
+    return (
+      <Tag
+        href={v.href}
+        class="group relative block overflow-hidden border border-ink-600 bg-ink-900/50 p-6 transition-all duration-300 hover:border-orange/60 hover:bg-ink-800/60"
+      >
+        <div class="absolute right-3 top-3 h-6 w-6 border-r border-t border-ink-500 transition-colors group-hover:border-orange/60"></div>
+
+        <div class="flex items-center justify-between">
+          <span class="hud-label">{v.id}</span>
+          <span class={`border px-2 py-0.5 font-mono text-[0.6rem] uppercase tracking-widest2 ${statusStyles[v.status]}`}>
+            {v.status}
+          </span>
+        </div>
+
+        <h3 class="mt-5 font-display text-lg font-bold uppercase tracking-wide text-smoke-100">
+          {v.name}
+        </h3>
+        <p class="mt-1 font-mono text-[0.7rem] uppercase tracking-widest2 text-orange/80">
+          {v.domain}
+        </p>
+        <p class="mt-4 font-body text-sm leading-relaxed text-smoke-400">
+          {v.summary}
+        </p>
+
+        {v.tags && (
+          <div class="mt-5 flex flex-wrap gap-2">
+            {v.tags.map((t) => (
+              <span class="font-mono text-[0.6rem] uppercase tracking-widest2 text-smoke-500">
+                #{t}
+              </span>
+            ))}
+          </div>
+        )}
+      </Tag>
+    );
+  })}
+</div>

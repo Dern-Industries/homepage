@@ -1,0 +1,77 @@
+---
+const links = [
+  { label: 'Ventures', href: '#ventures' },
+  { label: 'Contact', href: '#contact' },
+];
+---
+
+<header class="fixed inset-x-0 top-0 z-50">
+  <nav class="flex w-full items-center justify-between px-6 py-4 md:px-10">
+    <a href="#top" class="group flex items-center gap-3" aria-label="Dern Industries home">
+      <img src="/logo-d.png" alt="Dern Industries" class="h-9 w-9 transition-transform duration-300 group-hover:rotate-3" />
+    </a>
+    
+    <!-- <ul class="hidden items-center gap-8 md:flex">
+      {links.map((l) => (
+        <li>
+          <a
+            href={l.href}
+            class="group relative font-mono text-xs uppercase tracking-widest2 text-smoke-400 transition-colors hover:text-smoke-100"
+          >
+            {l.label}
+            <span class="absolute -bottom-1 left-0 h-px w-0 bg-orange transition-all duration-300 group-hover:w-full"></span>
+          </a>
+        </li>
+      ))}
+    </ul> -->
+
+    <div class="hidden items-center gap-3 font-mono text-[0.65rem] uppercase tracking-widest2 text-smoke-500 md:flex">
+      <!-- Animated signal bars -->
+      <div class="flex h-3 items-end gap-px">
+        <span class="signal-bar h-1 w-1 bg-orange/70"></span>
+        <span class="signal-bar h-2 w-1 bg-orange/80"></span>
+        <span class="signal-bar h-3 w-1 bg-orange"></span>
+      </div>
+      <span id="status-text" class="inline-block w-36 text-right">Connection Established</span>
+    </div>
+
+    <style>
+      .signal-bar {
+        animation: signal-bars 1.2s ease-in-out infinite;
+        transform-origin: bottom;
+      }
+      .signal-bar:nth-child(1) { animation-delay: 0s; }
+      .signal-bar:nth-child(2) { animation-delay: 0.2s; }
+      .signal-bar:nth-child(3) { animation-delay: 0.4s; }
+
+      @keyframes signal-bars {
+        0%, 100% { transform: scaleY(0.35); opacity: 0.6; }
+        50% { transform: scaleY(1); opacity: 1; }
+      }
+    </style>
+
+    <script>
+      const statusText = document.getElementById('status-text');
+      if (statusText) {
+        const start = Date.now();
+        const messages = () => {
+          const ping = Math.floor(10 + Math.random() * 15);
+          return [
+            'Connection: Stable',
+            `Latency: ${ping}ms`,
+            'Signal: Strong',
+          ];
+        };
+
+        const update = () => {
+          const list = messages();
+          const idx = Math.floor((Date.now() - start) / 3000) % list.length;
+          statusText.textContent = list[idx];
+        };
+
+        update();
+        setInterval(update, 1000);
+      }
+    </script>
+  </nav>
+</header>
