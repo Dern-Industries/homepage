@@ -7,7 +7,6 @@ import ParticleField from '../components/ParticleField.astro';
 import GlitchField from '../components/GlitchField.astro';
 import VentureGrid from '../components/VentureGrid.astro';
 import LiveClock from '../components/LiveClock.astro';
-import TerminalPanel from '../components/TerminalPanel.astro';
 ---
 
 <BaseLayout>
@@ -21,10 +20,9 @@ import TerminalPanel from '../components/TerminalPanel.astro';
     <section class="relative flex min-h-screen items-center justify-center overflow-hidden">
       <GlitchField />
 
-      <!-- Top-right widgets -->
-      <div class="absolute right-6 top-24 z-20 hidden animate-rise flex-col items-center gap-4 md:flex" style="animation-delay:0.3s">
+      <!-- Top-right widget -->
+      <div class="absolute right-6 top-24 z-20 hidden animate-rise md:block" style="animation-delay:0.3s">
         <LiveClock />
-        <TerminalPanel />
       </div>
 
       <!-- Foreground content -->
