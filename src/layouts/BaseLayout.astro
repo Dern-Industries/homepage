@@ -12,7 +12,7 @@ const {
 } = Astro.props;
 
 const canonical = new URL(Astro.url.pathname, Astro.site ?? 'https://dernindustries.com');
-const ogImage = new URL('/logo-full.png', Astro.site ?? 'https://dernindustries.com');
+const ogImage = new URL('/og-image.svg', Astro.site ?? 'https://dernindustries.com');
 
 const jsonLd = {
   '@context': 'https://schema.org',
