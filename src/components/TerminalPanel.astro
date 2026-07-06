@@ -1,0 +1,59 @@
+---
+// Faux terminal panel: cycles through fake boot / system logs.
+const lines = [
+  '[OK] kernel loaded',
+  '[OK] handshake established',
+  '[OK] entropy pool seeded',
+  '[OK] vaults mounted',
+  '[OK] divisions loaded: 3',
+  '[WARN] classified assets redacted',
+  '[OK] telemetry streaming',
+  '[OK] particle field online',
+  '[OK] signal strength: 100%',
+  '[OK] firewall active',
+  '[INFO] heartbeat received',
+  '[OK] checksum matched',
+  '[INFO] monitoring network traffic',
+  '[OK] relay sync complete',
+  '[OK] autonomous agents idle',
+  '[INFO] backup cycle scheduled',
+  '[OK] site integrity verified',
+  '[INFO] compiling index',
+  '[OK] emitters calibrated',
+  '[WARN] quantum fluctuation detected',
+  '[OK] orbital relay complete',
+  '[OK] neural mesh synchronized',
+  '[WARN] unauthorized access blocked',
+  '[OK] payload encrypted',
+  '[INFO] time-traversal insurance active',
+  '[OK] reactor core stable',
+];
+---
+
+<div class="terminal-panel w-72 overflow-hidden border border-ink-600 bg-ink-950/80 p-3 font-mono text-[0.65rem] uppercase tracking-widest2 text-smoke-400 backdrop-blur-sm">
+  <div class="flex items-center gap-2 border-b border-ink-700 pb-2 text-[0.6rem] text-smoke-500">
+    <span class="h-1.5 w-1.5 rounded-full bg-orange"></span>
+    <span>system.log</span>
+  </div>
+  <ul id="terminal-lines" class="mt-2 space-y-1">
+    {lines.slice(0, 4).map((line) => (
+      <li class="truncate">{line}</li>
+    ))}
+  </ul>
+</div>
+
+<script define:vars={{ lines }}>
+  const list = document.getElementById('terminal-lines');
+  if (list) {
+    let index = 0;
+    const cycle = () => {
+      const item = document.createElement('li');
+      item.className = 'truncate';
+      item.textContent = lines[index % lines.length];
+      list.appendChild(item);
+      if (list.children.length > 4) list.removeChild(list.firstChild);
+      index += 1;
+    };
+    setInterval(cycle, 2200);
+  }
+</script>

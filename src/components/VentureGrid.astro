@@ -1,35 +1,74 @@
 ---
 import { ventures, type VentureStatus } from '../data/ventures';
 
-const statusStyles: Record<VentureStatus, string> = {
-  live: 'text-orange border-orange/60',
-  building: 'text-orange-soft border-orange/40',
-  incoming: 'text-smoke-300 border-smoke-500/40',
-  classified: 'text-smoke-400 border-ink-500',
+interface StatusMeta {
+  label: string;
+  badgeClass: string;
+  borderClass: string;
+  hoverClass: string;
+  indicator: 'pulse' | 'progress' | 'incoming' | 'classified';
+}
+
+const statusMeta: Record<VentureStatus, StatusMeta> = {
+  live: {
+    label: 'LIVE',
+    badgeClass: 'text-orange border-orange/60',
+    borderClass: 'border-orange/40',
+    hoverClass: 'hover:border-orange/80',
+    indicator: 'pulse',
+  },
+  building: {
+    label: 'BUILDING',
+    badgeClass: 'text-orange-soft border-orange/40',
+    borderClass: 'border-orange/25',
+    hoverClass: 'hover:border-orange/60',
+    indicator: 'progress',
+  },
+  incoming: {
+    label: 'INCOMING',
+    badgeClass: 'text-smoke-300 border-smoke-500/40',
+    borderClass: 'border-dashed border-smoke-500/30',
+    hoverClass: 'hover:border-smoke-400/50',
+    indicator: 'incoming',
+  },
+  classified: {
+    label: 'CLASSIFIED',
+    badgeClass: 'text-smoke-400 border-ink-500',
+    borderClass: 'border-ink-500',
+    hoverClass: 'hover:border-smoke-500/40',
+    indicator: 'classified',
+  },
 };
+
+const staggerDelays = ['delay-100', 'delay-200', 'delay-300'];
 ---
 
 <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-  {ventures.map((v) => {
+  {ventures.map((v, i) => {
     const Tag = v.href ? 'a' : 'div';
+    const meta = statusMeta[v.status];
     return (
       <Tag
         href={v.href}
-        class="group relative block overflow-hidden border border-ink-600 bg-ink-900/50 p-6 transition-all duration-300 hover:border-orange/60 hover:bg-ink-800/60"
+        class={`group relative block overflow-hidden border bg-ink-900/50 p-6 transition-all duration-300 hover:bg-ink-800/60 ${meta.borderClass} ${meta.hoverClass} animate-card-enter ${staggerDelays[i % 3]}`}
       >
         <div class="absolute right-3 top-3 h-6 w-6 border-r border-t border-ink-500 transition-colors group-hover:border-orange/60"></div>
 
         <div class="flex items-center justify-between">
           <span class="hud-label">{v.id}</span>
-          <span class={`border px-2 py-0.5 font-mono text-[0.6rem] uppercase tracking-widest2 ${statusStyles[v.status]}`}>
-            {v.status}
+          <span class={`flex items-center gap-1.5 border px-2 py-0.5 font-mono text-[0.6rem] uppercase tracking-widest2 ${meta.badgeClass}`}>
+            {meta.indicator === 'pulse' && <span class="status-pulse h-1.5 w-1.5 rounded-full bg-orange"></span>}
+            {meta.indicator === 'progress' && <span class="build-progress h-px w-3 bg-orange/70"></span>}
+            {meta.indicator === 'incoming' && <span class="animate-bounce text-smoke-400">&#8595;</span>}
+            {meta.indicator === 'classified' && <span class="text-smoke-500">&#9632;</span>}
+            {meta.label}
           </span>
         </div>
 
         <h3 class="mt-5 font-display text-lg font-bold uppercase tracking-wide text-smoke-100">
           {v.name}
         </h3>
-        <p class="mt-1 font-mono text-[0.7rem] uppercase tracking-widest2 text-orange/80">
+        <p class={`mt-1 font-mono text-[0.7rem] uppercase tracking-widest2 ${v.status === 'classified' ? 'text-smoke-500 blur-[1px]' : 'text-orange/80'}`}>
           {v.domain}
         </p>
         <p class="mt-4 font-body text-sm leading-relaxed text-smoke-400">
